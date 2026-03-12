@@ -1,0 +1,128 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Main Container */
+.cont0 {
+  position: absolute;
+  top: 0px;
+ 
+  width: 30%;
+  padding: 15px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+/* Geometry Selector */
+.option-drawTypes {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+/* Dropdown */
+#Draw01 {
+  flex: 1;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: #f8f9fa;
+  cursor: pointer;
+}
+
+/* Add Button */
+.option-drawTypes button {
+  height: 36px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 6px;
+  background: #4f46e5;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.option-drawTypes button:hover {
+  background: #4338ca;
+}
+
+/* Measurement List */
+.DataContainers {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Item Row */
+.measurement-item {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  padding: 8px 10px;
+  background: white;
+  border-radius: 6px;
+  gap: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+/* List Items */
+.measurement-item li {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Icons */
+.measurement-item li svg {
+  font-size: 20px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.measurement-item li svg:hover {
+  transform: scale(1.15);
+}
+
+/* Color Picker */
+.colorSelector {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid #ccc;
+}
+
+.colorSelector input {
+  width: 100%;
+  height: 100%;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Measurement Value */
+.measurement-item li:nth-last-child(2) {
+  margin-left: auto;
+  font-weight: 500;
+}
+
+/* Draw Button */
+.show-vector {
+  margin-left: 5px;
+  cursor: pointer;
+}
+.del-btn{
+  color: gray;
+}
+.del-btn:hover{
+  color: red;
+}
