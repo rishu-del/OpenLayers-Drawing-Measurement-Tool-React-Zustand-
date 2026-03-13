@@ -1,159 +1,63 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Map from "ol/Map";
 import View from "ol/View";
 import OSM from "ol/source/OSM";
 import TileLayer from "ol/layer/Tile";
-import Draw ,{DrawEvent} from "ol/interaction/Draw";
-import Modify from "ol/interaction/Modify";
-import { Polygon, LineString, MultiPoint } from "ol/geom";
-import { fromLonLat } from "ol/proj";
-import { getArea, getLength } from "ol/sphere";
-import "./mapProvider.css";
-import MapdataFields from "./mapdataFields";
-import MapState from "../../services/mapStore";
-import {defaults as defaultInteractions} from "ol/interaction";
+import { defaults as defaultInteractions } from "ol/interaction";
+import MapdataFields from "../mapFields/MapdataFields.tsx";
+import Loader from "../loading/Loader";
+import "./MapProvider.css";
 
 export default function MapProvider() {
-
+  const [loading, setLoading] = useState(true);
+  const [map, setMap] = useState<Map | null>(null);
   const mapRef = useRef<HTMLDivElement | null>(null);
-  const mapInstance = useRef<Map | null>(null);
-  const drawRef = useRef<Draw | null>(null);
-  const modifyRef = useRef<Modify | null>(null);
 
-  const { items, updateItem, activeItemId } = MapState();
-
-  // Initialize map
+  // Simulate loading
   useEffect(() => {
-
-    if (!mapRef.current) return;
-
-    const map = new Map({
-      target: mapRef.current,
-      layers: [
-        new TileLayer({
-          source: new OSM(),
-        }),
-      ],
-      view: new View({
-        center: fromLonLat([0, 0]),
-        zoom: 2,
-      }),
-      interactions: defaultInteractions({
-      doubleClickZoom: false,
-       }),
-       controls: []
-    });
-
-    mapInstance.current = map;  
-    MapState.getState().setMap(map);
-
-    return () => map.setTarget(undefined);
-
+    const timer = setTimeout(() => setLoading(false), 1000);
+    return () => clearTimeout(timer);
   }, []);
 
-  // Handle Draw / Modify interactions
+  // Initialize OpenLayers map
   useEffect(() => {
-    const map = mapInstance.current;
-    if (!map || activeItemId === null) return;
-    const activeItem = items.find((i) => i.id === activeItemId);
-    if (!activeItem) return;
-    const source = activeItem.layer.getSource();
-    if (!source) return;
+    if (loading) return;
+    if (!mapRef.current) return;
 
+    let newMap: Map | null = null;
 
-    // remove old interactions 
-    if (drawRef.current) map.removeInteraction(drawRef.current);
-    if (modifyRef.current) map.removeInteraction(modifyRef.current);
-   
-    // DRAW MODE
-  
-    if (activeItem.isDrawing) {
-      const draw = new Draw({
-        source,
-        type: activeItem.type,
+    try {
+      newMap = new Map({
+        target: mapRef.current,
+        layers: [new TileLayer({ source: new OSM() })],
+        view: new View({ center: [0, 0], zoom: 2 }),
+        interactions: defaultInteractions({ doubleClickZoom: false }),
+        controls: [],
       });
-
-      map.addInteraction(draw);
-      drawRef.current = draw;
-
-      const onDrawEnd = (e: DrawEvent) => {
-
-        const geom = e.feature.getGeometry();
-
-        if (!geom) return;
-
-        if (geom instanceof Polygon) {
-          updateItem(activeItemId, {
-            area: getArea(geom),
-            length: undefined,
-          });
-        }
-
-        else if (geom instanceof LineString) {
-          updateItem(activeItemId, {
-            length: getLength(geom),
-            area: undefined,
-          });
-        }
-
-        else if (geom instanceof MultiPoint) {
-
-          const numPoints = source.getFeatures().length+1;
-
-          updateItem(activeItemId, { numPoints });
-
-        }
-
-        map.removeInteraction(draw);
-        drawRef.current = null;
-
-      };
-
-      draw.on("drawend", onDrawEnd);
-
-      return () => draw.un("drawend", onDrawEnd);
+      setMap(newMap);
+    } catch (err) {
+      console.error("Failed to initialize map:", err);
     }
 
-   
-    // EDIT 
-   
-    if (activeItem.isEditing) {
-      const modify = new Modify({
-        source,
-      });
-      map.addInteraction(modify);
-      modifyRef.current = modify;
-      modify.on("modifyend", (e) => {
-        const feature = e.features.item(0);
-        const geom = feature.getGeometry();
-        if (!geom) return;
-        if (geom instanceof Polygon) {
-          updateItem(activeItemId, { area: getArea(geom),});
-          console.log(getArea(geom));
-        }
-
-        else if (geom instanceof LineString) {
-          updateItem(activeItemId, {length: getLength(geom),});
-          console.log(getLength(geom));
-        }
-        else if (geom instanceof MultiPoint) {
-
-          const numPoints = geom.getCoordinates().length;
-          updateItem(activeItemId, { numPoints});
-          console.log(numPoints);
-        }
-      });
-    }
-
-  }, [items, activeItemId, updateItem]);
+    return () => {
+      try {
+        newMap?.setTarget(undefined);
+      } catch (err) {
+        console.warn("Failed to clean up map:", err);
+      }
+      setMap(null);
+    };
+  }, [loading]);
 
   return (
     <>
       <div className="map-container">
+        {loading && <Loader />}
         <div className="map" ref={mapRef} />
       </div>
 
-      <MapdataFields />
+      {/* Render MapdataFields only when map instance is ready */}
+      {map && <MapdataFields map={map} />}
     </>
   );
 }

@@ -47,24 +47,6 @@ pnpm run dev
 * **LineString:** Length (km)
 * **MultiPoint:** Number of points
 
-
-## file struture 
-src/ │ 
-├── services/
- │
- └── mapStore.ts # Zustand state management
-  │
-  ├── components/
-  │
-  └── map/ 
-  │ 
-  ├── mapProvider.tsx # Map initialization & interactions
-  │ 
-  ├── mapdataFields.tsx # UI for geometry controls 
-  │
-   └── mapProvider.css 
-   │ 
-   └── App.tsx
 ## License
 
 MIT

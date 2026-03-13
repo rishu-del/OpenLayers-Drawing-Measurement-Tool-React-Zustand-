@@ -1,15 +1,9 @@
+import "./App.css";
 
-import './App.css'
- import MapProvider from './components/map/mapProvider'
- 
+import MapProvider from "./components/map/MapProvider";
+
 function App() {
-
-
-  return (
-     <>
-     <MapProvider/>
-     </>
-  )
+  return <MapProvider />;
 }
 
-export default App
+export default App;
